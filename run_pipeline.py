@@ -24,4 +24,5 @@ if __name__ == "__main__":
         #### insert other function here
         pass
     fit = fit_lorentzian_mcmc(c["results_dir"],c["run_title"],int(c["n_draws"]),int(c["n_tune"]),data.fullfreq,data.spectra,len(data.frequencies),prior_frequencies = data.frequencies,prior_amplitudes = data.amps)
-
+    MCMC_diagnostics(c["results_dir"],c["run_title"],int(c["n_draws"]),int(c["n_tune"]),len(data.frequencies))
+    fit_analysis_plots(c["results_dir"],c["run_title"],int(c["n_draws"]),int(c["n_tune"]),len(data.frequencies))
