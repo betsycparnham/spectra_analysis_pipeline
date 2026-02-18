@@ -69,7 +69,7 @@ class frequency_spectrum:
         self.rp = 100
         self.nrange = np.array([0,-1])
         self.rpoints = np.arange(0, bg.nzones, 10) //10
-        self.f, self.vzspec1 = self.getspec(bg.vzc, bg.dt)
+        self.f, self.vzspec1 = self.getspec(bg.vzc50, bg.dt)
         self.period = (1 / (self.f*1e-6)) / (3600*24) # in days
         self.spec = self.vzspec1[:, self.rp]
         self.findpeaksparameters = self.get_modparams(model)
@@ -104,7 +104,7 @@ class frequency_spectrum:
           foo,f,Res,spectrum,foo = self.FreqSpectrum(data,tnum,dt,Nr,Rpoints)
           return f, spectrum
     
-    def get_modparams(model):
+    def get_modparams(self,model):
         if model == "lr":
             breaks = [0.17, 0.4, 0.5, 1] 
             rps = [100, 100, 140, 140, 140]
@@ -179,7 +179,7 @@ class frequency_spectrum:
         return fullspectrum
     
         # FUNCTION TO CALCULATE FINDPEAKS PARAMETERS
-    def peaksparameters(spectrum, prominence, distance, maxwidth, heightmultiplier):
+    def peaksparameters(self,spectrum, prominence, distance, maxwidth, heightmultiplier):
         promthresh = prominence
         distthresh = distance
         med = np.median(spectrum)
