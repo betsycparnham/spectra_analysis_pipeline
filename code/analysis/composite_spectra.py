@@ -1,3 +1,4 @@
+from pyexpat import model
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
@@ -64,17 +65,18 @@ class Read_CompositeSpectrum:
                 f"n_peaks={len(self.peakidxs)})")
 
 class frequency_spectrum:
-    def __init__(self,bg, breaks ,rps, smoothingparams, peakpars):
+    def __init__(self,bg, model):
         self.rp = 100
         self.nrange = np.array([0,-1])
         self.rpoints = np.arange(0, bg.nzones, 10) //10
         self.f, self.vzspec1 = self.getspec(bg.vzc, bg.dt)
         self.period = (1 / (self.f*1e-6)) / (3600*24) # in days
         self.spec = self.vzspec1[:, self.rp]
-        self.breaks = breaks
-        self.rps = rps
-        self.smoothingparams = smoothingparams
-        self.prompar, self.distpar, self.widthpar, self.heightpar = peakpars
+        self.findpeaksparameters = self.get_modparams(model)
+        self.breaks = self.findpeaksparameters[0]
+        self.rps = self.findpeaksparameters[1]
+        self.smoothingparams = self.findpeaksparameters[2]
+        self.prompar, self.distpar, self.widthpar, self.heightpar = self.findpeaksparameters[3]
         self.fullspectrum = self.generate_composite_normalized_smoothed_spectrum(self.period, self.vzspec1, self.breaks, self.rps, self.smoothingparams)
         self.p_thresh, self.d_thresh, self.min_w, self.max_w, self.h_thresh = self.peaksparameters(self.fullspectrum, self.prompar, self.distpar, 200, self.heightpar)
     def getspec(self,vzc, dt, Nt = 30000, Nr = 150, rpoints = 100, m = 1):
@@ -101,6 +103,51 @@ class frequency_spectrum:
           data = data_full[:, mode, :]
           foo,f,Res,spectrum,foo = self.FreqSpectrum(data,tnum,dt,Nr,Rpoints)
           return f, spectrum
+    
+    def get_modparams(model):
+        if model == "lr":
+            breaks = [0.17, 0.4, 0.5, 1] 
+            rps = [100, 100, 140, 140, 140]
+            smoothingparams = [10, 15, 15, 10, 10]
+            peakpars = [0.1, 7, 200, 8]
+        elif model == 'nr':
+            breaks = [0.17, 0.45, 1.48] 
+            rps = [100, 140, 140, 140]
+            smoothingparams = [3, 5, 3, 3]
+            peakpars = [0.1, 3, 200, 7]
+        elif model == 'fr2':
+            breaks = [0.17, 0.45, 1.48] 
+            rps = [100, 140, 140, 140]
+            smoothingparams = [5, 3, 4, 0]
+            peakpars = [0.07, 1, 200, 7]
+        elif model == 'brn':
+            breaks = [0.17, 0.3, 0.6] 
+            rps = [100, 140, 140, 140]
+            smoothingparams = [3, 4, 10, 5]
+            peakpars = [0.075, 2, 200, 7]
+        elif model =='nrbrn1':
+            breaks = [0.17, 0.45, 1.48] 
+            rps = [100, 140, 140, 140]
+            smoothingparams = [5, 3, 4, 0]
+            peakpars = [0.075, 2, 200, 7]
+        elif model == 'fr2brn1':
+            breaks = [0.17, 0.3, 0.6] 
+            rps = [100, 140, 140, 140]
+            smoothingparams = [3, 4, 3, 3]
+            peakpars = [0.075, 2, 200, 7]
+        elif model == 'a214':
+            breaks = [0.17, 0.4, 0.634, 0.774, 1] 
+            rps = [100, 100, 140, 140, 140, 140]
+            smoothingparams = [10, 15, 20, 5, 5, 10]
+            peakpars = [0.1, 4, 200, 8]
+        elif model == 'a514':
+            breaks = [0.17, 0.4, 0.7, 1] 
+            rps = [100, 100, 140, 140, 140]
+            smoothingparams = [10, 15, 8, 8, 10]
+            peakpars = [0.1, 4, 200, 7]
+        else:
+            raise ValueError(f"Model {model} not recognized. Please choose from 'lr', 'nr', 'fr2', 'brn', 'nrbrn1', 'fr2brn1', 'a214', 'a514'.")
+        return breaks, rps, smoothingparams, peakpars
 
 
     def generate_composite_normalized_smoothed_spectrum(self,period, spectrum, breaks, rps, smoothingparams):
@@ -168,7 +215,7 @@ def calculate_expectedpeaks(period, peaks):
     return expected_p, residuals, percentresiduals, detpeaknum, chunks, left_edges, right_edges
 
 class compute_composite_spectra():
-    def __init__(self, data_dir,bg_file, vzc_file, nnew,ntotal,numprocs,time_step, breaks, rps, smoothingparams, peakpars):
+    def __init__(self, data_dir,bg_file, vzc_file, nnew,ntotal,numprocs,time_step, model):
         # Getting Background State Profiles
         bg = BackgroundProfile(nnew=1024, ntotal=722, numprocs=30, time_step=1000, refstate=bg_file,vzc_file= vzc_file)
         #Take every 10th radial point as that's how the velocities are written
@@ -177,7 +224,7 @@ class compute_composite_spectra():
         ############################################### no field ##########################################################
 
         # Calculating Frequency Spectrum
-        freq_spectrum = frequency_spectrum(bg, breaks ,rps, smoothingparams, peakpars)
+        freq_spectrum = frequency_spectrum(bg, model)
 
         peaks, props = find_peaks(freq_spectrum.fullspectrum, prominence=freq_spectrum.p_thresh, distance=freq_spectrum.d_thresh, width=(freq_spectrum.min_w, freq_spectrum.max_w), height=freq_spectrum.h_thresh)
         #expected_p, residuals, percentresiduals, detpeaknum, chunks, left_edges, right_edges = calculate_expectedpeaks(freq_spectrum.period, peaks)
@@ -192,3 +239,6 @@ class compute_composite_spectra():
         f, p, compspec, peakidxs, allspec, freqpeaks, periodpeaks, allamp = specdata.freq, specdata.period, specdata.composite_spec, specdata.peakidxs, specdata.allspec, specdata.freq_peaks, specdata.period_peaks, specdata.all_amplitudes
         print('Data Read Successfully')
         
+
+
+

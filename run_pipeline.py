@@ -18,7 +18,8 @@ c = cfg["settings"]
 
 if __name__ == "__main__":
     if c.getboolean("composite"):
-        compute_composite_spectra(c["data_dir"],c["bg_file"],c["vzc_file"],c["nnew"],c["ntotal"],c["numprocs"],c["time_step"], c["breaks"], c["rps"], c["smoothingparams"], c["peakpars"])
+
+        compute_composite_spectra(c["data_dir"],c["bg_file"],c["vzc_file"],c["nnew"],c["ntotal"],c["numprocs"],c["time_step"], c["modelname"])
         data = Read_CompositeSpectrum(c["data_dir"] + "xc0.5-nofield-composite.npz")
     else:
         #### insert other function here
