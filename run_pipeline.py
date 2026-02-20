@@ -18,10 +18,11 @@ c = cfg["settings"]
 
 if __name__ == "__main__":
     if c.getboolean("composite"):
-        compute_composite_spectra(c["data_dir"],c["bg_file"],c["vzc50_file"],c["vzs50_file"],c["nnew"],c["ntotal"],c["numprocs"],c["time_step"])
+        compute_composite_spectra(c["data_dir"],c["bg_file"],c["vzc_file"],c["nnew"],c["ntotal"],c["numprocs"],c["time_step"], c["modelname"])
         data = Read_CompositeSpectrum(c["data_dir"] + "xc0.5-nofield-composite.npz")
     else:
         #### insert other function here
         pass
     fit = fit_lorentzian_mcmc(c["results_dir"],c["run_title"],int(c["n_draws"]),int(c["n_tune"]),data.fullfreq,data.spectra,len(data.frequencies),prior_frequencies = data.frequencies,prior_amplitudes = data.amps)
-
+    MCMC_diagnostics(c["results_dir"],c["run_title"],int(c["n_draws"]),int(c["n_tune"]),len(data.frequencies))
+    fit_analysis_plots(c["results_dir"],c["run_title"],int(c["n_draws"]),int(c["n_tune"]),len(data.frequencies))
