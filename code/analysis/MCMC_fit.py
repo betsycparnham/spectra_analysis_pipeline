@@ -112,10 +112,11 @@ class fit_lorentzian_least_squares():
         return loc_array, fwhm_array,amp_array
 
 class fit_lorentzian_mcmc():
-    def __init__(self,results_dir,title,n_draws,n_tune,x,f,n_peaks,prior_frequencies = None,prior_amplitudes = None):
+    def __init__(self,model,results_dir,title,n_draws,n_tune,x,f,n_peaks,prior_frequencies = None,prior_amplitudes = None):
         self.x = x
         self.f = f
         self.prior_frequencies = prior_frequencies
+        self.model = model
         #if self.prior_frequencies is not None:
         #    self.prior_amplitudes = prior_amplitudes[:,120]
         #else:

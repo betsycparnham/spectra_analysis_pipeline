@@ -105,6 +105,7 @@ class frequency_spectrum:
           return f, spectrum
     
     def get_modparams(self,model):
+        print("model used:",model)
         if model == "lr":
             breaks = [0.17, 0.4, 0.5, 1] 
             rps = [100, 100, 140, 140, 140]
@@ -231,11 +232,11 @@ class compute_composite_spectra():
 
         # Saving Data
         frequency, period, spec_composite, peakidxs, specallradii = freq_spectrum.f, freq_spectrum.period, freq_spectrum.fullspectrum, peaks, freq_spectrum.vzspec1
-        np.savez_compressed(data_dir + 'xc0.5-nofield-composite.npz', freq = frequency, period=period, compositespectrum=spec_composite, peak_idxs=peakidxs, allspec=specallradii)
+        np.savez_compressed(data_dir + f'xc0.5-{model}-composite.npz', freq = frequency, period=period, compositespectrum=spec_composite, peak_idxs=peakidxs, allspec=specallradii)
         print('Data Saved')
 
 
-        specdata = Read_CompositeSpectrum(data_dir + 'xc0.5-nofield-composite.npz')
+        specdata = Read_CompositeSpectrum(data_dir + f'xc0.5-{model}-composite.npz')
         f, p, compspec, peakidxs, allspec, freqpeaks, periodpeaks, allamp = specdata.freq, specdata.period, specdata.composite_spec, specdata.peakidxs, specdata.allspec, specdata.freq_peaks, specdata.period_peaks, specdata.all_amplitudes
         print('Data Read Successfully')
         

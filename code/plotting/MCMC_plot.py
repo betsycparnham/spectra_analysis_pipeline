@@ -14,6 +14,8 @@ class fit_analysis_plots():
         self.n_peaks = n_peaks
         self.n_draws = n_draws
         self.n_tune = n_tune
+        print("results dir",results_dir)
+        print("title",title)
         self.load_directories(results_dir,title,n_draws,n_tune,n_peaks)
         if plot==True:
             self.plot_fits(results_dir,title,n_draws,n_tune,n_peaks,self.full_freq,self.spectra,self.x_fit,self.f_fit,zoom = True,log = True)
