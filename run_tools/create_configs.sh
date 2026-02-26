@@ -21,8 +21,8 @@ modelname = ${mn}
 #MCMC SETTINGS
 n_peaks = None
 peaks_extra = ${pks}
-n_draws = 2
-n_tune= 2
+n_draws = 2000
+n_tune= 2000
 results_dir = /home/c4052420/spectra_analysis_pipeline/results/
 run_title = None
 

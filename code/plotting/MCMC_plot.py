@@ -9,6 +9,12 @@ import pymc as pm
 import arviz as az
 from pathlib import Path
 
+
+
+    
+
+
+
 class fit_analysis_plots():
     def __init__(self,results_dir, title, n_draws,n_tune,n_peaks,plot=True):
         self.n_peaks = n_peaks
@@ -16,6 +22,8 @@ class fit_analysis_plots():
         self.n_tune = n_tune
         print("results dir",results_dir)
         print("title",title)
+        self.title = title
+        self.results_dir = results_dir
         self.load_directories(results_dir,title,n_draws,n_tune,n_peaks)
         if plot==True:
             self.plot_fits(results_dir,title,n_draws,n_tune,n_peaks,self.full_freq,self.spectra,self.x_fit,self.f_fit,zoom = True,log = True)
@@ -146,16 +154,70 @@ class loss_analysis():
 
         axs.flatten()[-1].set_xlim(9,25)
         fig.savefig("compartison.png")
+class period_spacings():
+    def __init__(self,fit_analysis: fit_analysis_plots):
+        self.full_freq = fit_analysis.full_freq
+        self.spectra = fit_analysis.spectra
+        self.x_fit = fit_analysis.x_fit
+        self.locs = fit_analysis.locs
+        self.amps = fit_analysis.amps
+        self.fwhms = fit_analysis.fwhms
+        self.title = fit_analysis.title
+        self.results_dir = fit_analysis.results_dir
+        self.n_draws = fit_analysis.n_draws
+        self.n_tune = fit_analysis.n_tune
+        self.n_peaks = fit_analysis.n_peaks
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--n_peaks",default = 15)
-parser.add_argument("--n_draws", type = int, default = 1000)
-parser.add_argument("--n_tune", type = int, default = 1000)
-parser.add_argument("--data_file", type = str, default = "/home/c4052420/spectra_analysis/Initialdataforbetsy.npz")
-args = parser.parse_args()
+        self.period_locs = self.spectrum_to_periodogram(self.locs)
+        self.period_locs = np.sort(self.period_locs)
+        del_p,period,radial_orders = self.pspmake2_period(self.period_locs)
+        self.plot_period_spacings(self.title,self.results_dir,self.period_locs,del_p)
+
+    def spectrum_to_periodogram(self,frequencies):
+        # Input spectra at one radius and corresponding frequencies
+        periods = 1 / (frequencies * 1e-6)  # in seconds
+        P = periods / (3600 * 24)  # convert to days
+
+        return P
+
+    def pspmake2_period(self,period_days, nstart = 0):
+        import numpy as np
+
+        period_days = (np.asarray(period_days))
+
+        # Period spacings (in days)
+        deltap = -np.diff(period_days)
+
+        # Reverse ordering if required
+        period_r = period_days[::-1]
+
+        radial_orders_r = np.arange(len(period_r)) + nstart
+        radial_orders = -radial_orders_r[::-1]
+
+        return deltap, period_days[1:], radial_orders[1:]
+    def plot_period_spacings(self,title,results_dir,period_locs,del_p):
+        directory = results_dir + f"{self.title}_full_freq_d{self.n_draws}_t{self.n_tune}_peaks{self.n_peaks}/"
+        
+        plt.figure()
+        plt.plot(period_locs[1:],del_p,label='No Field', color='blue', marker='o', linestyle='solid')
+        
+        print("del_p",del_p)
+        plt.ylabel(fr"Period Spacings ($days$)")
+        plt.xlabel(fr"Period ($days$)")
+        plt.title(fr"{self.title}")
+        plt.savefig(directory + f"period_spacing_{self.title}.png")
 
 if __name__ == "__main__":
-    fit = fit_analysis_plots(args.n_draws,args.n_tune,args.n_peaks)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--n_peaks",default = 15)
+    parser.add_argument("--n_draws", type = int, default = 1000)
+    parser.add_argument("--n_tune", type = int, default = 1000)
+    parser.add_argument("--results_dir",type = str)
+    parser.add_argument("--title",type = str)
+    args = parser.parse_args()
+
+    fit = fit_analysis_plots(args.results_dir,args.title,args.n_draws,args.n_tune,args.n_peaks)
+    period_spacings(fit)
     loss_analysis(fit)
 
 
