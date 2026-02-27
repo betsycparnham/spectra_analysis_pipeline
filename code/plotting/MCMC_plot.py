@@ -56,9 +56,11 @@ class fit_analysis_plots():
         if zoom:
             fig, axs = plt.subplots(2,1,figsize = (9,12),constrained_layout = True)
             axs.flatten()[1].set_xlabel("Frequency (mHz)")
+            axs.flatten()[0].set_xlim(0,200)
+            axs.flatten()[1].set_xlim(10,25)
             fig.suptitle(r"$n_{peaks}$ =" + f"{self.n_peaks}",fontsize = 15)
         else:
-            fig, axs = plt.subplots(1,1,figsize = (9,3),constrained_layout = True)
+            fig, axs = plt.subplots(1,1,figsize = (5,3),constrained_layout = True)
             axs.set_title(r"$n_{peaks}$ =" + f"{self.n_peaks}",fontsize = 15)
         for ax in np.array([axs]).flatten():
             ax.plot(fullfreq,spectra,label = 'original spectrum')
@@ -66,12 +68,13 @@ class fit_analysis_plots():
 
             if log:
                 ax.set_yscale("log")
-            ax.set_xlim(0,200)
+            if not zoom:
+                ax.set_xlim(0,200)
             ax.legend()
             ax.set_ylabel(r"Amplitude (cm$s^{-1}$)")
 
             for loc in self.locs:
-                ax.plot(np.ones(100)*loc,np.linspace(0,np.max(f_fit),100),linestyle = "--",color = "red",linewidth = 0.8)
+                ax.plot(np.ones(100)*loc,np.linspace(0,np.max(f_fit),100),linestyle = "--",color = "red",linewidth = 0.5)
 
         directory = results_dir + f"{title}_full_freq_d{n_draws}_t{n_tune}_peaks{n_peaks}/"
 
@@ -205,6 +208,9 @@ class period_spacings():
         plt.ylabel(fr"Period Spacings ($days$)")
         plt.xlabel(fr"Period ($days$)")
         plt.title(fr"{self.title}")
+        if np.min(del_p)<-0.3:
+            plt.ylim(-0.2,0.1)
+            plt.xlim(0,2)
         plt.savefig(directory + f"period_spacing_{self.title}.png")
 
 if __name__ == "__main__":
