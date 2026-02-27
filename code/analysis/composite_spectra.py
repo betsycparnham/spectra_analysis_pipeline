@@ -66,20 +66,23 @@ class Read_CompositeSpectrum:
 
 class frequency_spectrum:
     def __init__(self,bg, model):
-        self.rp = 100
+        #self.rp = 100
         self.nrange = np.array([0,-1])
         self.rpoints = np.arange(0, bg.nzones, 10) //10
-        self.f, self.vzspec1 = self.getspec(bg.vzc50, bg.dt)
-        self.period = (1 / (self.f*1e-6)) / (3600*24) # in days
-        self.spec = self.vzspec1[:, self.rp]
+
         self.findpeaksparameters = self.get_modparams(model)
         self.breaks = self.findpeaksparameters[0]
         self.rps = self.findpeaksparameters[1]
         self.smoothingparams = self.findpeaksparameters[2]
         self.prompar, self.distpar, self.widthpar, self.heightpar = self.findpeaksparameters[3]
+        self.Nt = self.findpeaksparameters[4]
+        self.f, self.vzspec1 = self.getspec(bg.vzc50, bg.dt, self.Nt) # Now Calculates vzspec1 correctly for all radii
+        self.period = (1 / (self.f*1e-6)) / (3600*24) # in days
+        #self.spec = self.vzspec1[:, self.rp]
         self.fullspectrum = self.generate_composite_normalized_smoothed_spectrum(self.period, self.vzspec1, self.breaks, self.rps, self.smoothingparams)
         self.p_thresh, self.d_thresh, self.min_w, self.max_w, self.h_thresh = self.peaksparameters(self.fullspectrum, self.prompar, self.distpar, 200, self.heightpar)
-    def getspec(self,vzc, dt, Nt = 30000, Nr = 150, rpoints = 100, m = 1):
+
+    def getspec(self,vzc, dt, Nt, m = 1, Nr = 150):
         vzc = vzc[:Nt, :, :]
         vzhat = vzc
         freq, vzspec_m1 = self.fspec_m(vzhat, Nt, dt, Nr, self.rpoints, m)
@@ -105,50 +108,57 @@ class frequency_spectrum:
           return f, spectrum
     
     def get_modparams(self,model):
-        print("model used:",model)
         if model == "lr":
             breaks = [0.17, 0.4, 0.5, 1] 
             rps = [100, 100, 140, 140, 140]
             smoothingparams = [10, 15, 15, 10, 10]
             peakpars = [0.1, 7, 200, 8]
+            Nt = 30000
         elif model == 'nr':
             breaks = [0.17, 0.45, 1.48] 
             rps = [100, 140, 140, 140]
             smoothingparams = [3, 5, 3, 3]
             peakpars = [0.1, 3, 200, 7]
+            Nt = 22000
         elif model == 'fr2':
             breaks = [0.17, 0.45, 1.48] 
             rps = [100, 140, 140, 140]
             smoothingparams = [5, 3, 4, 0]
             peakpars = [0.07, 1, 200, 7]
+            Nt = 20000
         elif model == 'brn':
             breaks = [0.17, 0.3, 0.6] 
             rps = [100, 140, 140, 140]
             smoothingparams = [3, 4, 10, 5]
             peakpars = [0.075, 2, 200, 7]
+            Nt = 16000
         elif model =='nrbrn1':
             breaks = [0.17, 0.45, 1.48] 
             rps = [100, 140, 140, 140]
             smoothingparams = [5, 3, 4, 0]
             peakpars = [0.075, 2, 200, 7]
+            Nt = 16000
         elif model == 'fr2brn1':
             breaks = [0.17, 0.3, 0.6] 
             rps = [100, 140, 140, 140]
             smoothingparams = [3, 4, 3, 3]
             peakpars = [0.075, 2, 200, 7]
+            Nt = 20000
         elif model == 'a214':
             breaks = [0.17, 0.4, 0.634, 0.774, 1] 
             rps = [100, 100, 140, 140, 140, 140]
             smoothingparams = [10, 15, 20, 5, 5, 10]
             peakpars = [0.1, 4, 200, 8]
+            Nt = 22000
         elif model == 'a514':
             breaks = [0.17, 0.4, 0.7, 1] 
             rps = [100, 100, 140, 140, 140]
             smoothingparams = [10, 15, 8, 8, 10]
             peakpars = [0.1, 4, 200, 7]
+            Nt = 22000
         else:
             raise ValueError(f"Model {model} not recognized. Please choose from 'lr', 'nr', 'fr2', 'brn', 'nrbrn1', 'fr2brn1', 'a214', 'a514'.")
-        return breaks, rps, smoothingparams, peakpars
+        return breaks, rps, smoothingparams, peakpars, Nt
 
 
     def generate_composite_normalized_smoothed_spectrum(self,period, spectrum, breaks, rps, smoothingparams):
