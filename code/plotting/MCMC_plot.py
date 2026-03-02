@@ -197,7 +197,7 @@ class period_spacings():
         radial_orders_r = np.arange(len(period_r)) + nstart
         radial_orders = -radial_orders_r[::-1]
 
-        return deltap, period_days[1:], radial_orders[1:]
+        return -deltap, period_days[1:], radial_orders[1:]
     def plot_period_spacings(self,title,results_dir,period_locs,del_p):
         directory = results_dir + f"{self.title}_full_freq_d{self.n_draws}_t{self.n_tune}_peaks{self.n_peaks}/"
         

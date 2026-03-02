@@ -16,7 +16,10 @@ class BackgroundProfile:
     def __init__(self, nnew=1024, ntotal=722, numprocs=30, time_step=1000, refstate = None,vzc_file = None):
         self.vzc_file = vzc_file
         backgroundstate = np.genfromtxt(refstate,delimiter='\t')
-        self.vzc50 = sci.FortranFile(str(vzc_file)).read_record(dtype="f8").reshape((39000,11,150),order='F')
+        self.vzc50 = sci.FortranFile(str(vzc_file)).read_record(dtype="f8")
+        shape = int(len(self.vzc50)/(11*150))
+        print("SHAPE",shape)
+        self.vzc50 = self.vzc50.reshape((shape,11,150),order='F')
         # ---- parameters ----
         self.dt = time_step
 

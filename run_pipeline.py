@@ -28,15 +28,17 @@ if __name__ == "__main__":
         run_title = c["modelname"]
     else:
         run_title = c["run_title"]
-    if c["n_peaks"] == "None":
+    print("N PEAKS CONFIG",c["n_peaks"])
+    print(c["peaks_extra"])
+    if c["n_peaks"] == "None" and c["peaks_extra"] == "None":
         n_peaks = len(data.frequencies)
-    elif c["extra_peaks"] == "None":
+    elif c["peaks_extra"] == "None":
         n_peaks = c["n_peaks"]
-    elif c["n_peaks"] != "None" and c["extra_peaks"] == "None":
+    elif c["n_peaks"] != "None" and c["peaks_extra"] == "None":
         n_peaks = int(c["n_peaks"])
-    elif c["n_peaks"] == "None" and c["extra_peaks"] != "None":
-        n_peaks = len(data.frequencies) + int(c["extra_peaks"])
-
+    elif c["n_peaks"] == "None" and c["peaks_extra"] != "None":
+        n_peaks = len(data.frequencies) + int(c["peaks_extra"])
+    print("N PEAKS",n_peaks)
     fit = fit_lorentzian_mcmc(c["modelname"],c["results_dir"],run_title,int(c["n_draws"]),int(c["n_tune"]),data.fullfreq,data.spectra,n_peaks,prior_frequencies = data.frequencies,prior_amplitudes = data.amps)
     MCMC_diagnostics(c["results_dir"],run_title,int(c["n_draws"]),int(c["n_tune"]),n_peaks)
     fit_analysis_plots(c["results_dir"],run_title,int(c["n_draws"]),int(c["n_tune"]),n_peaks)
