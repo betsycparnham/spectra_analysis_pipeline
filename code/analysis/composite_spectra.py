@@ -112,22 +112,22 @@ class frequency_spectrum:
     
     def get_modparams(self,model):
         if model == "lr":
-            breaks = [0.17, 0.4, 0.5, 1] 
-            rps = [100, 100, 140, 140, 140]
-            smoothingparams = [10, 15, 15, 10, 10]
-            peakpars = [0.1, 7, 200, 8]
+            breaks = [0.09, 0.17, 0.4, 0.5, 1.1] 
+            rps = [100, 100, 100, 140, 140, 140]
+            smoothingparams = [20, 10, 15, 15, 12, 10]
+            peakpars = [0.159, 5, 200, 8]
             Nt = 30000
         elif model == 'nr':
-            breaks = [0.17, 0.45, 1.48] 
-            rps = [100, 140, 140, 140]
-            smoothingparams = [3, 5, 3, 3]
-            peakpars = [0.1, 3, 200, 7]
+            breaks = [0.17, 0.45, 0.8, 1.48] 
+            rps = [100, 140, 140, 140, 140]
+            smoothingparams = [3, 5, 3, 3, 3]
+            peakpars = [0.225, 3, 200, 7]
             Nt = 22000
         elif model == 'fr2':
             breaks = [0.17, 0.45, 1.48] 
             rps = [100, 140, 140, 140]
             smoothingparams = [5, 3, 4, 0]
-            peakpars = [0.07, 1, 200, 7]
+            peakpars = [0.09, 2, 200, 7]
             Nt = 20000
         elif model == 'brn':
             breaks = [0.17, 0.3, 0.6] 
@@ -148,19 +148,25 @@ class frequency_spectrum:
             peakpars = [0.075, 2, 200, 7]
             Nt = 20000
         elif model == 'a214':
-            breaks = [0.17, 0.4, 0.634, 0.774, 1] 
-            rps = [100, 100, 140, 140, 140, 140]
-            smoothingparams = [10, 15, 20, 5, 5, 10]
-            peakpars = [0.1, 4, 200, 8]
+            breaks = [0.09, 0.17, 0.4, 0.5, 0.815, 1.1] 
+            rps = [100, 100, 100, 140, 140, 140, 140]
+            smoothingparams = [20, 10, 15, 15, 12, 5, 5]
+            peakpars = [0.12, 3, 200, 7]
             Nt = 22000
         elif model == 'a514':
-            breaks = [0.17, 0.4, 0.7, 1] 
+            breaks = [0.17, 0.4, 0.7, 1.05] 
             rps = [100, 100, 140, 140, 140]
-            smoothingparams = [10, 15, 8, 8, 10]
-            peakpars = [0.1, 4, 200, 7]
+            smoothingparams = [10, 15, 7, 7, 10]
+            peakpars = [0.275, 15, 200, 7]
             Nt = 22000
+        elif model == 'fr2mag':
+            breaks = [0.12, 0.17, 0.22, 0.45] 
+            rps = [100, 100, 100, 140, 140]
+            smoothingparams = [0, 0, 0, 0, 6]
+            peakpars = [0.15, 3, 200, 7]
+            Nt = 30000
         else:
-            raise ValueError(f"Model {model} not recognized. Please choose from 'lr', 'nr', 'fr2', 'brn', 'nrbrn1', 'fr2brn1', 'a214', 'a514'.")
+            raise ValueError(f"Model {model} not recognized. Please choose from 'lr', 'nr', 'fr2', 'brn', 'nrbrn1', 'fr2brn1', 'a214', 'a514', 'fr2mag'.")
         return breaks, rps, smoothingparams, peakpars, Nt
 
 

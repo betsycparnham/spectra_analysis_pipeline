@@ -1,4 +1,4 @@
-modelnames=("lr" "nr" "fr2" "brn" "nrbrn1" "fr2brn1" "a214" "a514")
+modelnames=("lr" "nr" "fr2" "brn" "nrbrn1" "fr2brn1" "a214" "a514" "fr2mag")
 peaks_extra=("None" "3" "5" "10")
 
 
@@ -11,6 +11,7 @@ vzc_files["nrbrn1"]="/home/c4052420/spectra_analysis_pipeline/data/vzcr-rad-2ms5
 vzc_files["fr2brn1"]="/home/c4052420/spectra_analysis_pipeline/data/vzcr-rad-2ms5000fr2brn1-2000-23000et.dat"
 vzc_files["a214"]="/home/c4052420/spectra_analysis_pipeline/data/vzcr-rad-2ms5000a214-5000-27000et.dat"
 vzc_files["a514"]="/home/c4052420/spectra_analysis_pipeline/data/vzcr-rad-2ms5000a514-5000-28000et.dat"
+vzc_files["fr2mag"]="/home/c4052420/spectra_analysis_pipeline/data/vzcr-rad-2ms5000fr2mag-2000-32000et.dat"
 
 for mn in "${modelnames[@]}"; do
     for pks in "${peaks_extra[@]}"; do
