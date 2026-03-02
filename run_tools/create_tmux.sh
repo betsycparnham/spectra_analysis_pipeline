@@ -1,4 +1,4 @@
-modelnames=("lr" "nr" "fr2" "brn" "nrbrn1" "fr2brn1" "a214" "a514")
+modelnames=("lr" "nr" "fr2" "brn" "nrbrn1" "fr2brn1" "a214" "a514" "fr2mag")
 peaks_extra=("None" "3" "5" "10")
 
 for mn in "${modelnames[@]}"; do

@@ -1,4 +1,4 @@
-modelnames=("lr" "nr" "fr2" "brn" "nrbrn1" "fr2brn1" "a214" "a514")
+modelnames=("lr" "nr" "fr2" "brn" "nrbrn1" "fr2brn1" "a214" "a514" "fr2mag")
 model_peaks=("31" "94" "none" "41" "41" "1" "45" "36")
 
 i=0
